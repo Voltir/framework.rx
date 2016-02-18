@@ -43,15 +43,15 @@ trait Framework extends LowPriorityFramework {
     bindNode(last)
   }
 
-  implicit def RxAttrValue[T](implicit ctx: Ctx.Owner, av: AttrValue[T]) = new AttrValue[Rx[T]]{
-    def apply(t: Element, a: Attr, r: Rx[T]): Unit = {
-      r.trigger { av.apply(t, a, r.now)}
+  implicit def RxAttrValue[T: AttrValue](implicit ctx: Ctx.Owner) = new AttrValue[Rx.Dynamic[T]]{
+    def apply(t: Element, a: Attr, r: Rx.Dynamic[T]): Unit = {
+      r.trigger { implicitly[AttrValue[T]].apply(t, a, r.now) }
     }
   }
 
-  implicit def RxStyleValue[T](implicit ctx: Ctx.Owner, sv: StyleValue[T]) = new StyleValue[Rx[T]]{
-    def apply(t: Element, s: Style, r: Rx[T]): Unit = {
-      r.trigger { sv.apply(t, s, r.now) }
+  implicit def RxStyleValue[T: StyleValue](implicit ctx: Ctx.Owner) = new StyleValue[Rx.Dynamic[T]]{
+    def apply(t: Element, s: Style, r: Rx.Dynamic[T]): Unit = {
+      r.trigger { implicitly[StyleValue[T]].apply(t, s, r.now) }
     }
   }
 }
