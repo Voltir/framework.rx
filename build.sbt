@@ -13,6 +13,10 @@ libraryDependencies += "com.lihaoyi" %%% "scalarx" % "0.3.1"
 libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.5.4"
 
 //Publish Info
+licenses += ("MIT License", url("http://www.opensource.org/licenses/mit-license.php"))
+
+homepage := Some(url("http://stabletechs.com/"))
+
 scmInfo := Some(ScmInfo(
   url("https://github.com/Voltir/framework.rx"),
   "scm:git:git@github.com/Voltir/framework.rx.git",
