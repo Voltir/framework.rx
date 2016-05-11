@@ -1,6 +1,7 @@
 package framework
 
 import org.scalajs.dom.Element
+import org.scalajs.dom.raw.HTMLElement
 import rx._
 
 import scala.util.{Failure, Success}
@@ -22,6 +23,12 @@ trait LowPriorityFramework { self: Framework =>
 
 trait Framework extends LowPriorityFramework {
 
+  def inDOM(elem: HTMLElement): Boolean = {
+    if(elem == org.scalajs.dom.document.documentElement) true
+    else if(elem.parentElement == null) false
+    else inDOM(elem.parentElement)
+  }
+
   /**
     * Sticks some Rx into a Scalatags fragment, which means hooking up an Obs
     * to propagate changes into the DOM.
@@ -37,7 +44,12 @@ trait Framework extends LowPriorityFramework {
     var last = rSafe
     n.triggerLater {
       val newLast = rSafe
-      last.parentElement.replaceChild(newLast, last)
+      println("In dom? " + inDOM(last))
+      if(last.parentElement != null) {
+        last.parentElement.replaceChild(newLast, last)
+      } else {
+        println("Was null!: " + n)
+      }
       last = newLast
     }
     bindNode(last)
