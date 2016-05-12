@@ -4,13 +4,13 @@ name := "frameworkrx"
 
 organization := "com.stabletechs"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
-version := "0.1.1-SNAPSHOT"
+version := "0.1.2-SNAPSHOT"
 
 libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.0"
 libraryDependencies += "com.lihaoyi" %%% "scalarx" % "0.3.1"
-libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.5.4"
+libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.5.5"
 
 //Publish Info
 licenses += ("MIT License", url("http://www.opensource.org/licenses/mit-license.php"))

@@ -10,49 +10,28 @@ import scalatags.JsDom.all._
 /**
  * A minimal binding between Scala.Rx and Scalatags and Scala-Js-Dom
  */
-trait LowPriorityFramework { self: Framework =>
-
-  /**
-    * Wraps reactive strings in spans, so they can be referenced/replaced
-    * when the Rx changes.
-    */
-  implicit def RxStr[T](r: Rx[T])(implicit f: T => Frag, ctx: Ctx.Owner): Frag = {
-    RxHtmlTag(Rx(span(r())))
-  }
-}
-
-trait Framework extends LowPriorityFramework {
-
-  def inDOM(elem: HTMLElement): Boolean = {
-    if(elem == org.scalajs.dom.document.documentElement) true
-    else if(elem.parentElement == null) false
-    else inDOM(elem.parentElement)
-  }
+trait Framework {
 
   /**
     * Sticks some Rx into a Scalatags fragment, which means hooking up an Obs
     * to propagate changes into the DOM.
     */
-  implicit def RxHtmlTag(n: Rx[HtmlTag])(implicit ctx: Ctx.Owner): Frag = {
-    def rSafe = n match {
-      case r: Rx.Dynamic[HtmlTag] => r.toTry match {
+  implicit def RxFrag[T](n: Rx[T])(implicit f: T => Frag, ctx: Ctx.Owner): Frag = {
+    def fSafe: Frag = n match {
+      case r: Rx.Dynamic[T] => r.toTry match {
         case Success(v) => v.render
         case Failure(e) => span(e.getMessage, backgroundColor := "red").render
       }
-      case v: Var[HtmlTag] => v.now.render
+      case v: Var[T] => v.now.render
     }
-    var last = rSafe
+    var last = fSafe.render
+    val container = div(cls:="_rx",last).render
     n.triggerLater {
-      val newLast = rSafe
-      println("In dom? " + inDOM(last))
-      if(last.parentElement != null) {
-        last.parentElement.replaceChild(newLast, last)
-      } else {
-        println("Was null!: " + n)
-      }
-      last = newLast
+      val newLast = fSafe.render
+      container.replaceChild(newLast,last)
+      last = newLast.render
     }
-    bindNode(last)
+    bindNode(container)
   }
 
   implicit def RxAttrValue[T: AttrValue](implicit ctx: Ctx.Owner) = new AttrValue[Rx.Dynamic[T]]{
