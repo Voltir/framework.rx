@@ -4,6 +4,7 @@ import org.scalajs.dom.Element
 import org.scalajs.dom.raw.HTMLElement
 import rx._
 
+import scala.annotation.tailrec
 import scala.util.{Failure, Success}
 import scalatags.JsDom.all._
 
@@ -17,6 +18,14 @@ trait Framework {
     * to propagate changes into the DOM.
     */
   implicit def RxFrag[T](n: Rx[T])(implicit f: T => Frag, ctx: Ctx.Owner): Frag = {
+
+    @tailrec def clearChildren(node: org.scalajs.dom.Node): Unit = {
+      if(node.firstChild != null) {
+        node.removeChild(node.firstChild)
+        clearChildren(node)
+      }
+    }
+
     def fSafe: Frag = n match {
       case r: Rx.Dynamic[T] => r.toTry match {
         case Success(v) => v.render
@@ -24,12 +33,17 @@ trait Framework {
       }
       case v: Var[T] => v.now.render
     }
+
     var last = fSafe.render
-    val container = div(cls:="_rx",last).render
+
+    val container = div(cls:="_rx")(last).render
+
     n.triggerLater {
       val newLast = fSafe.render
-      container.replaceChild(newLast,last)
-      last = newLast.render
+      //Rx[Seq[T]] can generate multiple children per propagate, so use clearChildren instead of replaceChild
+      clearChildren(container)
+      container.appendChild(newLast)
+      last = newLast
     }
     bindNode(container)
   }
