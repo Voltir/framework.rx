@@ -36,7 +36,7 @@ trait Framework {
 
     var last = fSafe.render
 
-    val container = div(cls:="_rx")(last).render
+    val container = span(cls:="_rx")(last).render
 
     n.triggerLater {
       val newLast = fSafe.render
