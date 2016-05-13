@@ -6,7 +6,7 @@ organization := "com.stabletechs"
 
 scalaVersion := "2.11.8"
 
-version := "0.1.2-SNAPSHOT"
+version := "0.1.2"
 
 libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.0"
 libraryDependencies += "com.lihaoyi" %%% "scalarx" % "0.3.1"
